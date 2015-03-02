@@ -20,7 +20,8 @@ scpFiles()
   echo "SCPing files to $instance"
   for file in "${files[@]}"
   do
-    scpCmd="scp -i $privateKey $file $instance:$baseDir/"
+    `echo "mkdir $baseDir" | ssh -i $privateKey $instance /bin/sh`
+    scpCmd="scp -i $privateKey $file $instance:$baseDir/`basename $file`"
     echo $scpCmd
     `$scpCmd`
   done  
@@ -33,6 +34,7 @@ runScreen()
   screenName=$3
   screenScript=$4
   cmd=$5
-  echo "Running screen in $instance with screen name $screenName and command $cmd"
-  `echo "$screenScript $screenName $cmd" | ssh -i $privateKey $instance /bin/sh`
+  screenCmd="$screenScript $screenName \"$cmd\""
+  echo "Screen command:$screenCmd"
+  ssh -i $privateKey $instance "$screenCmd"
 }
