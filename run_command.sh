@@ -1,6 +1,7 @@
 #!/bin/bash
 inputFile=$1
 machineList=$2
+privateKey=$3
 fileCount()
 {
   fileName=$1
@@ -12,6 +13,20 @@ freshFile()
   fileName=$1
   rm -rf $fileName
   touch $fileName
+}
+
+scpFiles()
+{
+  instance=$1
+  baseDir=$2
+  privateKey=$3
+  files=$4
+  echo "SCPing files to $instance"
+  for file in ${files[@]}
+  do
+    scpCmd="scp -i $privateKey $file $instance:$baseDir/"
+    echo $scpCmd
+  done  
 }
 
 currentDir=`pwd`
@@ -42,7 +57,6 @@ cd $currentDir
 numFilesPerMachine=`expr $numInputFiles / $numMachines`
 echo "Files per machine:$numFilesPerMachine"
 i=0
-freshFile $file_instance_map_file
 while read machine; do
   j=0
   filesArr=()
@@ -52,12 +66,9 @@ while read machine; do
     i=`expr $i + 1`
     j=`expr $j + 1`
   done
-  separator=","
-  regex="$( printf "${separator}%s" "${filesArr[@]}" )"
-  regex="${regex:${#separator}}"
-  files=${regex}
-  echo "Files going to $machine:$files"
+  scpFiles $machine "~/inputs" $privateKey ${filesArr[@]}
   echo "$machine,$files" >> $file_instance_map_file
 done < $machineList
+#scpFiles ${instanceFileMap[@]}
 
 rm -rf $inputDir/x*
