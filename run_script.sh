@@ -10,7 +10,6 @@ if [ -f $markerFile ]; then
 fi
 echo "Reading input from $i of input file:$inputFile"
 awk "NR > $i" $inputFile | while read inputItem; do
-  echo "Line:$inputItem"
   i=`expr $i + 1`
   cmd="$scriptCmd \"$inputItem\" $outputDir $logFile"
   echo "Running:$cmd"
