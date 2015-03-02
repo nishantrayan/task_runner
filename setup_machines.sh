@@ -5,7 +5,9 @@ inputFile=$1
 machineList=$2
 privateKey=$3
 scriptFile=$4
+scriptName=`basename $scriptFile`
 runnerScript="./run_script.sh"
+screenScript="./run_screen.sh" 
 
 currentDir=`pwd`
 inputDir=`dirname $inputFile`
@@ -30,23 +32,21 @@ echo "Input files:${inputFiles[@]}"
 numInputFiles=$(ls $inputDir/x* | wc -l)
 echo "Split generated $numInputFiles files"
 
-# create map of files to upload
+# upload all the files
 cd $currentDir
 numFilesPerMachine=`expr $numInputFiles / $numMachines`
 echo "Files per machine:$numFilesPerMachine"
 i=0
 while read machine; do
-  j=0
-  filesArr=()
-  while [ $j -lt $numFilesPerMachine ]; do
-    inputFile=${inputFiles[i]} 
-    filesArr+=(`readlink -f $inputFile`)
-    i=`expr $i + 1`
-    j=`expr $j + 1`
-  done
+  inputFile=${inputFiles[i]}
+  inputName=`basename $inputFile`
+  filesArr=($inputFile)
   scpFiles $machine "~/inputs" $privateKey filesArr[@]
-  scriptFiles=($scriptFile $runnerScript)
+  scriptFiles=($scriptFile $runnerScript $screenScript)
   scpFiles $machine "~/scripts" $privateKey scriptFiles[@]
+  cmd="~/scripts/run_script.sh ~/scripts/$scriptName ~/inputs/$inputName /tmp/ /tmp/log.log /tmp/marker.txt"
+  runScreen $machine $privateKey "$inputName" "~/scripts/`basename $screenScript`" "$cmd"
+  i=`expr $i + 1`
 done < $machineList
 
 rm -rf $inputDir/x*

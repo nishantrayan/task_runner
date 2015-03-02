@@ -22,6 +22,17 @@ scpFiles()
   do
     scpCmd="scp -i $privateKey $file $instance:$baseDir/"
     echo $scpCmd
-    #`$scpCmd`
+    `$scpCmd`
   done  
+}
+
+runScreen()
+{
+  instance=$1
+  privateKey=$2
+  screenName=$3
+  screenScript=$4
+  cmd=$5
+  echo "Running screen in $instance with screen name $screenName and command $cmd"
+  `echo "$screenScript $screenName $cmd" | ssh -i $privateKey $instance /bin/sh`
 }
