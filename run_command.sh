@@ -26,6 +26,7 @@ scpFiles()
   do
     scpCmd="scp -i $privateKey $file $instance:$baseDir/"
     echo $scpCmd
+    `$scpCmd`
   done  
 }
 
