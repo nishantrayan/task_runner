@@ -1,6 +1,11 @@
 #!/bin/bash
 source util.sh
-
+getopts r restartOpt
+if [ $? -eq 0 ]; then
+  echo "Restart option specified"
+  restart=0
+fi
+shift $((OPTIND-1))
 inputFile=$1
 machineList=$2
 privateKey=$3
@@ -44,7 +49,17 @@ while read machine; do
   scpFiles $machine "~/inputs" $privateKey filesArr[@]
   scriptFiles=($scriptFile $runnerScript $screenScript)
   scpFiles $machine "~/scripts" $privateKey scriptFiles[@]
-  cmd="~/scripts/run_script.sh ~/scripts/$scriptName ~/inputs/$inputName /tmp/ /tmp/log.log /tmp/marker.txt"
+  targetLogFile="/tmp/log.log"
+  targetMarkerFile="/tmp/marker.txt"
+  cmd="~/scripts/run_script.sh ~/scripts/$scriptName ~/inputs/$inputName /tmp/ $targetLogFile $targetMarkerFile"
+  # check restart flag and kill screen session and log / marker files before running screen
+  test "$restart"
+  if [ $? -eq 0 ]; then
+    echo "Restarting screen sessions"
+    runCommand $machine $privateKey "screen -X -S xaa quit"
+    runCommand $machine $privateKey "rm $targetLogFile"
+    runCommand $machine $privateKey "rm $targetMarkerFile"
+  fi
   runScreen $machine $privateKey "$inputName" "~/scripts/`basename $screenScript`" "$cmd"
   i=`expr $i + 1`
 done < $machineList

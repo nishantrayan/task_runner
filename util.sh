@@ -27,6 +27,15 @@ scpFiles()
   done  
 }
 
+runCommand()
+{
+  instance=$1
+  privateKey=$2
+  cmd=$3
+  echo "Executing command on $instance:$cmd"
+  `echo "$cmd" | ssh -i $privateKey $instance /bin/bash`
+}
+
 runScreen()
 {
   instance=$1
@@ -36,5 +45,5 @@ runScreen()
   cmd=$5
   screenCmd="$screenScript $screenName \"$cmd\""
   echo "Screen command:$screenCmd"
-  ssh -i $privateKey $instance "$screenCmd"
+  `echo "$screenCmd" | ssh -i $privateKey $instance /bin/bash`
 }

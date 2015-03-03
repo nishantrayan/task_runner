@@ -11,10 +11,10 @@ fi
 echo "Reading input from $i of input file:$inputFile"
 awk "NR > $i" $inputFile | while read inputItem; do
   i=`expr $i + 1`
-  cmd="$scriptCmd \"$inputItem\" $outputDir $logFile"
+  cmd="$scriptCmd $inputItem $outputDir $logFile"
   echo "Running:$cmd"
   $cmd
-  [ $? -eq 0 ] && echo $i > $markerFile
+  echo $i > $markerFile
 done 
 
 echo "Done processing input $inputFile"
