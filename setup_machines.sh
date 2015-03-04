@@ -24,7 +24,7 @@ fileCount $inputFile
 numInputItems=$fileCount
 echo "Number of lines of input:$numInputItems"
 echo "Number of machines to use:$numMachines"
-splitSize=`expr $numInputItems / $numMachines`
+splitSize=`python -c "from math import ceil; print ceil($numInputItems.0/$numMachines)"`
 echo "Chunk size of input:$splitSize"
 
 # Start splitting
@@ -56,7 +56,7 @@ while read machine; do
   test "$restart"
   if [ $? -eq 0 ]; then
     echo "Restarting screen sessions"
-    runCommand $machine $privateKey "screen -X -S xaa quit"
+    runCommand $machine $privateKey "screen -X -S $inputName quit"
     runCommand $machine $privateKey "rm $targetLogFile"
     runCommand $machine $privateKey "rm $targetMarkerFile"
   fi
