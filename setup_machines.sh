@@ -24,7 +24,7 @@ fileCount $inputFile
 numInputItems=$fileCount
 echo "Number of lines of input:$numInputItems"
 echo "Number of machines to use:$numMachines"
-splitSize=`python -c "from math import ceil; print ceil($numInputItems.0/$numMachines)"`
+splitSize=`python -c "from math import ceil; print(int(ceil($numInputItems.0/$numMachines)))"`
 echo "Chunk size of input:$splitSize"
 
 # Start splitting
