@@ -20,7 +20,7 @@ scpFiles()
   echo "SCPing files to $instance"
   for file in "${files[@]}"
   do
-    `echo "mkdir $baseDir" | ssh -i $privateKey $instance /bin/sh`
+    `echo "mkdir $baseDir" | ssh -o "StrictHostKeyChecking no" -i $privateKey $instance /bin/sh`
     scpCmd="scp -i $privateKey $file $instance:$baseDir/`basename $file`"
     echo $scpCmd
     `$scpCmd`
@@ -33,7 +33,7 @@ runCommand()
   privateKey=$2
   cmd=$3
   echo "Executing command on $instance:$cmd"
-  `echo "$cmd" | ssh -i $privateKey $instance /bin/bash`
+  `echo "$cmd" | ssh -o "StrictHostKeyChecking no" -i $privateKey $instance /bin/bash`
 }
 
 runScreen()
@@ -45,5 +45,5 @@ runScreen()
   cmd=$5
   screenCmd="$screenScript $screenName \"$cmd\""
   echo "Screen command:$screenCmd"
-  `echo "$screenCmd" | ssh -i $privateKey $instance /bin/bash`
+  `echo "$screenCmd" | ssh -o "StrictHostKeyChecking no" -i $privateKey $instance /bin/bash`
 }
